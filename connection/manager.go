@@ -10,6 +10,9 @@ type ConnectionManager struct {
 	activeConnection []*Connection
 	connectionsMU    sync.Mutex
 
+	// called after a sucessfull login
+	Upgrader func(c *Connection, username string)
+
 	connCounter int
 }
 

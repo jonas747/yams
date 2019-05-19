@@ -187,6 +187,9 @@ const (
 	LoginServerLoginStart
 	LoginServerEncryptionResponse
 	LoginServerLoginPluginResponse
+
+	// internal ones
+	Disconnected
 )
 
 func reverseMapping(in map[int]int) map[int]int {
@@ -420,6 +423,8 @@ var stringedYAMIDs = map[YAMPacketID]string{
 	LoginServerLoginStart:          "LoginServerLoginStart",
 	LoginServerEncryptionResponse:  "LoginServerEncryptionResponse",
 	LoginServerLoginPluginResponse: "LoginServerLoginPluginResponse",
+
+	Disconnected: "Disconnected",
 }
 
 func (y YAMPacketID) String() string {

@@ -3,6 +3,7 @@ package connection
 import (
 	"bytes"
 	"encoding/binary"
+	"github.com/google/uuid"
 	"github.com/jonas747/yams/connection/packetmappings"
 	"github.com/pkg/errors"
 	"io"
@@ -32,7 +33,12 @@ type Connection struct {
 	version int
 	state   *int32
 
+	uuid uuid.UUID
+
 	writeLock sync.Mutex
+
+	eventHandlerLock sync.RWMutex
+	eventHandler     func(packetID packetmappings.YAMPacketID) error
 }
 
 func newConn(manager *ConnectionManager, id int, conn net.Conn) *Connection {
@@ -54,6 +60,12 @@ func (c *Connection) Log(f string, args ...interface{}) {
 
 func (c *Connection) GetID() int {
 	return c.id
+}
+
+func (c *Connection) SetEventHandler(f func(packetID packetmappings.YAMPacketID) error) {
+	c.eventHandlerLock.Lock()
+	c.eventHandler = f
+	c.eventHandlerLock.Unlock()
 }
 
 func (c *Connection) Reader() {
@@ -132,15 +144,27 @@ func (c *Connection) emitPacketEvent(packetID int) error {
 	state := atomic.LoadInt32(c.state)
 	yamID := packetmappings.GetYAMPacketID(c.version, int(state), false, packetID)
 
+	c.eventHandlerLock.RLock()
+	cHandler := c.eventHandler
+	c.eventHandlerLock.RUnlock()
+
+	c.Log("Handling: 0x%2x (%s), l:%d, data: %#v", packetID, yamID.String(), len(c.readbuf), c.readbuf)
+
+	if cHandler != nil {
+		err := cHandler(yamID)
+		if err != nil {
+			return err
+		}
+	}
+
 	if targetHandlers, ok := handlers[yamID]; ok {
-		c.Log("Handling: 0x%2x (%s), l:%d, data: %#v", packetID, yamID.String(), len(c.readbuf), c.readbuf)
 		for _, v := range targetHandlers {
 			err := v(c)
 			if err != nil {
 				return err
 			}
 		}
-	} else {
+	} else if cHandler == nil {
 		c.Log("No handlers for event: 0x%2x (%s), data: %#v", packetID, yamID.String(), c.readbuf)
 	}
 
