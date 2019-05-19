@@ -34,14 +34,22 @@ func (cm *ConnectionManager) Listen(addr string) error {
 }
 
 func (cm *ConnectionManager) handleConnection(conn net.Conn, id int) {
-	log.Println("New connection ", id)
-
 	yamConn := newConn(cm, id, conn)
+	yamConn.Log("connection opened")
+
 	cm.connectionsMU.Lock()
 	cm.activeConnection = append(cm.activeConnection, yamConn)
 	cm.connectionsMU.Unlock()
 
 	yamConn.Reader()
 
-	log.Println("Connection closed ", id)
+	yamConn.Log("connection closed")
+
+	cm.connectionsMU.Lock()
+	for i, v := range cm.activeConnection {
+		if v.GetID() == id {
+			cm.activeConnection = append(cm.activeConnection[:i], cm.activeConnection[i+1:]...)
+		}
+	}
+	cm.connectionsMU.Unlock()
 }

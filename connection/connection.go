@@ -52,6 +52,10 @@ func (c *Connection) Log(f string, args ...interface{}) {
 	log.Printf(prefix+f, args...)
 }
 
+func (c *Connection) GetID() int {
+	return c.id
+}
+
 func (c *Connection) Reader() {
 	for {
 		err := c.readNextPacket()
@@ -169,6 +173,27 @@ func (c *Connection) ReadUInt16() (i uint16, err error) {
 	return i, nil
 }
 
+func (c *Connection) ReadUint64() (i uint64, err error) {
+	if c.ReadError != nil {
+		return 0, c.ReadError
+	}
+
+	if c.readCursor+8 > len(c.readbuf) {
+		err = errors.New("Out of bounds readuint16")
+		c.ReadError = err
+		return 0, err
+	}
+
+	i = binary.BigEndian.Uint64(c.readbuf[c.readCursor : c.readCursor+8])
+	c.readCursor += 8
+	return i, nil
+}
+
+func (c *Connection) ReadInt64() (i int64, err error) {
+	ui, err := c.ReadUint64()
+	return int64(ui), err
+}
+
 func (c *Connection) ReadVarInt() (i int, err error) {
 	if c.ReadError != nil {
 		return 0, c.ReadError
@@ -189,8 +214,6 @@ func (c *Connection) ReadString() (s string, err error) {
 		return "", err
 	}
 
-	c.Log("String length: %d readbug:%d, cursor: %d", l, len(c.readbuf), c.readCursor)
-
 	if c.readCursor+l > len(c.readbuf) {
 		err = errors.New("Out of bounds string")
 		c.ReadError = err
@@ -202,7 +225,7 @@ func (c *Connection) ReadString() (s string, err error) {
 	return s, nil
 }
 
-func (c *Connection) WritePacketAsync(id packetmappings.YAMPacketID, components ...PacketComponent) {
+func (c *Connection) WritePacketAsync(id packetmappings.YAMPacketID, components ...PacketField) {
 	go func() {
 		err := c.WritePacket(id, components...)
 		if err != nil {
@@ -211,7 +234,7 @@ func (c *Connection) WritePacketAsync(id packetmappings.YAMPacketID, components 
 	}()
 }
 
-func (c *Connection) WritePacket(id packetmappings.YAMPacketID, components ...PacketComponent) error {
+func (c *Connection) WritePacket(id packetmappings.YAMPacketID, components ...PacketField) error {
 	c.writeLock.Lock()
 	defer c.writeLock.Unlock()
 
@@ -243,30 +266,3 @@ func (c *Connection) WritePacket(id packetmappings.YAMPacketID, components ...Pa
 	_, err = buf.WriteTo(c.conn)
 	return err
 }
-
-type netByteReader struct {
-	net.Conn
-	buf []byte
-}
-
-func (n *netByteReader) ReadByte() (b byte, err error) {
-	if n.buf == nil {
-		n.buf = make([]byte, 1)
-	}
-
-	_, err = io.ReadFull(n.Conn, n.buf)
-	return n.buf[0], err
-}
-
-// func (c *Connection) WriteVarInt(i int32) (err error) {
-// 	if cap(c.writebuf) < 5 {
-// 		c.writebuf = make([]byte, 5)
-// 	} else {
-// 		c.writebuf = c.writebuf[:5]
-// 	}
-
-// 	length := binary.PutVarint(c.writebuf, int64(i))
-// 	_, err =
-// 	_, err = player.io.wtr.Write(buff[:length])
-// 	return err
-// }

@@ -1,0 +1,1 @@
+The connection package is responsible for dealing with low level connections.

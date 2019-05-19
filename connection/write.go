@@ -5,7 +5,7 @@ import (
 	"io"
 )
 
-type PacketComponent interface {
+type PacketField interface {
 	MarshalMinecraft(w io.Writer) (n int, err error)
 }
 
@@ -15,9 +15,9 @@ func WriteVarInt(i int, w io.Writer) (n int, err error) {
 	return w.Write(buf[:n])
 }
 
-type VarIntComponent int
+type VarIntField int
 
-func (i VarIntComponent) MarshalMinecraft(w io.Writer) (n int, err error) {
+func (i VarIntField) MarshalMinecraft(w io.Writer) (n int, err error) {
 	return WriteVarInt(int(i), w)
 }
 
@@ -31,8 +31,20 @@ func WriteString(s string, w io.Writer) (n int, err error) {
 	return n + n2, err
 }
 
-type StringComponent string
+type StringField string
 
-func (s StringComponent) MarshalMinecraft(w io.Writer) (n int, err error) {
+func (s StringField) MarshalMinecraft(w io.Writer) (n int, err error) {
 	return WriteString(string(s), w)
+}
+
+func WriteInt64(i int64, w io.Writer) (n int, err error) {
+	buf := make([]byte, 8)
+	binary.BigEndian.PutUint64(buf, uint64(i))
+	return w.Write(buf)
+}
+
+type Int64Field int64
+
+func (i Int64Field) MarshalMinecraft(w io.Writer) (n int, err error) {
+	return WriteInt64(int64(i), w)
 }
