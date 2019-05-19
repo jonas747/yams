@@ -2,6 +2,7 @@ package connection
 
 import (
 	"github.com/jonas747/yams/connection/packetmappings"
+	"github.com/pkg/errors"
 )
 
 type HandlerFunc func(c *Connection) error
@@ -26,6 +27,11 @@ func handleHandshake(c *Connection) error {
 
 	if err != nil {
 		return err
+	}
+
+	if protcocolVersion != 482 {
+		// Too lazy to support more atm
+		return errors.New("Unsopported protocol version (!= 482)")
 	}
 
 	c.SetState(State(nextState))
