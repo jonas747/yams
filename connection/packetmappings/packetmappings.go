@@ -60,17 +60,21 @@ const (
 	PlayClientExplosion
 	PlayClientUnloadChunk
 	PlayClientChangeGameState
+	PlayClientOpenHorseWindow
 	PlayClientKeepAlive
 	PlayClientChunkData
 	PlayClientEffect
 	PlayClientParticle
+	PlayClientUpdateLight
 	PlayClientJoinGame
 	PlayClientMapData
+	PlayClientTradeList
 	PlayClientEntity
 	PlayClientEntityRelativeMove
 	PlayClientEntityLookAndRelativeMove
 	PlayClientEntityLook
 	PlayClientVehicleMove
+	PlayClientOpenBook
 	PlayClientOpenSignEditor
 	PlayClientCraftRecipeResponse
 	PlayClientPlayerAbilities
@@ -89,6 +93,8 @@ const (
 	PlayClientWorldBorder
 	PlayClientCamera
 	PlayClientHeldItemChange
+	PlayClientUpdateViewPosition
+	PlayClientUpdateViewDistance
 	PlayClientDisplayScoreboard
 	PlayClientEntityMetadata
 	PlayClientAttachEntity
@@ -113,6 +119,7 @@ const (
 	PlayClientEntityEffect
 	PlayClientDeclareRecipes
 	PlayClientTags
+	PlayClientEntitySoundEffect
 
 	// Serverbound
 	PlayServerTeleportConfirm
@@ -158,6 +165,10 @@ const (
 	PlayServerSpectate
 	PlayServerPlayerBlockPlacement
 	PlayServerUseItem
+	PlayServerUpdateJigsawBlock
+	PlayServerSetDifficulty
+	PlayServerClickWindowButton
+	PlayServerLockDifficulty
 
 	// Status
 	StatusClientResponse
@@ -282,17 +293,21 @@ var stringedYAMIDs = map[YAMPacketID]string{
 	PlayClientExplosion:                 "PlayClientExplosion",
 	PlayClientUnloadChunk:               "PlayClientUnloadChunk",
 	PlayClientChangeGameState:           "PlayClientChangeGameState",
+	PlayClientOpenHorseWindow:           "PlayClientOpenHorseWindow",
 	PlayClientKeepAlive:                 "PlayClientKeepAlive",
 	PlayClientChunkData:                 "PlayClientChunkData",
 	PlayClientEffect:                    "PlayClientEffect",
 	PlayClientParticle:                  "PlayClientParticle",
+	PlayClientUpdateLight:               "PlayClientUpdateLight",
 	PlayClientJoinGame:                  "PlayClientJoinGame",
 	PlayClientMapData:                   "PlayClientMapData",
+	PlayClientTradeList:                 "PlayClientTradeList",
 	PlayClientEntity:                    "PlayClientEntity",
 	PlayClientEntityRelativeMove:        "PlayClientEntityRelativeMove",
 	PlayClientEntityLookAndRelativeMove: "PlayClientEntityLookAndRelativeMove",
 	PlayClientEntityLook:                "PlayClientEntityLook",
 	PlayClientVehicleMove:               "PlayClientVehicleMove",
+	PlayClientOpenBook:                  "PlayClientOpenBook",
 	PlayClientOpenSignEditor:            "PlayClientOpenSignEditor",
 	PlayClientCraftRecipeResponse:       "PlayClientCraftRecipeResponse",
 	PlayClientPlayerAbilities:           "PlayClientPlayerAbilities",
@@ -311,6 +326,8 @@ var stringedYAMIDs = map[YAMPacketID]string{
 	PlayClientWorldBorder:               "PlayClientWorldBorder",
 	PlayClientCamera:                    "PlayClientCamera",
 	PlayClientHeldItemChange:            "PlayClientHeldItemChange",
+	PlayClientUpdateViewPosition:        "PlayClientUpdateViewPosition",
+	PlayClientUpdateViewDistance:        "PlayClientUpdateViewDistance",
 	PlayClientDisplayScoreboard:         "PlayClientDisplayScoreboard",
 	PlayClientEntityMetadata:            "PlayClientEntityMetadata",
 	PlayClientAttachEntity:              "PlayClientAttachEntity",
@@ -335,6 +352,7 @@ var stringedYAMIDs = map[YAMPacketID]string{
 	PlayClientEntityEffect:              "PlayClientEntityEffect",
 	PlayClientDeclareRecipes:            "PlayClientDeclareRecipes",
 	PlayClientTags:                      "PlayClientTags",
+	PlayClientEntitySoundEffect:         "PlayClientEntitySoundEffect",
 
 	// Serverbound
 	PlayServerTeleportConfirm:            "PlayServerTeleportConfirm",
@@ -380,6 +398,10 @@ var stringedYAMIDs = map[YAMPacketID]string{
 	PlayServerSpectate:                   "PlayServerSpectate",
 	PlayServerPlayerBlockPlacement:       "PlayServerPlayerBlockPlacement",
 	PlayServerUseItem:                    "PlayServerUseItem",
+	PlayServerUpdateJigsawBlock:          "PlayServerUpdateJigsawBlock",
+	PlayServerSetDifficulty:              "PlayServerSetDifficulty",
+	PlayServerClickWindowButton:          "PlayServerClickWindowButton",
+	PlayServerLockDifficulty:             "PlayServerLockDifficulty",
 
 	// Status
 	StatusClientResponse: "StatusClientResponse",
